@@ -202,7 +202,8 @@ var fxKeyboard = {
                             {"input": fxKeyboard.activeOSK, "state": open, "elementYTop": this.focusElementYTop, "elementYBottom": this.focusElementYBottom}
                     , "xpath": this.hierarchy.pathInMaster, "uri": this.settings.startingURL}), "*");
             } else {
-                if (kb.style.display !== 'block') {
+                var wasOpen = kb.style.display === 'block';
+                if (!wasOpen) {
                     if (this.previousOSK !== null ? this.previousOSK !== this.activeOSK && document.getElementById(fxKeyboard.previousOSK).style.display !== "none" : false) {
                         document.getElementById(this.previousOSK).style.display = "none";
                     }
@@ -226,13 +227,21 @@ var fxKeyboard = {
 					}
 				}
                 this._layoutMainRows(kb);
-                if ((((kb.getBoundingClientRect().top !== 0 ? this.focusElementYBottom : this.focusElementYTop) + window.scrollY) > 
-                        ((kb.getBoundingClientRect().top !== 0 ? kb.getBoundingClientRect().top : kb.getBoundingClientRect().bottom) + window.scrollY))) {
-                    kb.style.top = 0;
-                } else if ((((kb.getBoundingClientRect().bottom !== window.innerHeight ? kb.getBoundingClientRect().bottom : kb.getBoundingClientRect().top) + window.scrollY) > 
-                        ((kb.getBoundingClientRect().bottom !== window.innerHeight ? this.focusElementYTop : this.focusElementYBottom) + window.scrollY))) {
-                    kb.style.bottom = 0;
-                    kb.style.top = null;
+                this._fitSpecialLabels(kb);
+                if (!wasOpen || this.positionedFocusElement !== this.focusElement ||
+                        (this.focusElement === null && (this.positionedFocusTop !== this.focusElementYTop ||
+                        this.positionedFocusBottom !== this.focusElementYBottom))) {
+                    var keyboardHeight = kb.getBoundingClientRect().height;
+                    var bottomOverlap = Math.max(0, Math.min(this.focusElementYBottom, window.innerHeight) -
+                        Math.max(this.focusElementYTop, window.innerHeight - keyboardHeight));
+                    var topOverlap = Math.max(0, Math.min(this.focusElementYBottom, keyboardHeight) -
+                        Math.max(this.focusElementYTop, 0));
+                    var showAtTop = bottomOverlap > topOverlap;
+                    kb.style.top = showAtTop ? "0px" : "";
+                    kb.style.bottom = showAtTop ? "" : "0px";
+                    this.positionedFocusElement = this.focusElement;
+                    this.positionedFocusTop = this.focusElementYTop;
+                    this.positionedFocusBottom = this.focusElementYBottom;
                 }
             }
         } else {
@@ -241,6 +250,7 @@ var fxKeyboard = {
             } else {
                 kb.style.display = "none";
                 this.focusElement = null;
+                this.positionedFocusElement = null;
             }
         }
     },
@@ -249,6 +259,18 @@ var fxKeyboard = {
 		var kb = document.getElementById(this.activeOSK);
 		return kb != null ? kb.style.display === 'block' : false;
 	},
+
+    _fitSpecialLabels: function (kb) {
+        var context = document.createElement("canvas").getContext("2d");
+        if (!context) return;
+        var maxFontSize = 35 * this.settings.scale;
+        context.font = maxFontSize + "px arial, sans-serif";
+        for (var key of kb.getElementsByClassName("fxkey-special")) {
+            var availableWidth = Math.max(1, key.getBoundingClientRect().width - 16 * this.settings.scale);
+            var textWidth = context.measureText(key.textContent).width;
+            key.style.fontSize = Math.min(maxFontSize, maxFontSize * availableWidth / Math.max(1, textWidth)) + "px";
+        }
+    },
 
     _layoutMainRows: function (kb) {
         if (kb.id !== this.inputTypes.keyboard) {
@@ -320,6 +342,9 @@ var fxKeyboard = {
     lastPress: "null",
     keepOpen: false,
     focusElement: null,
+    positionedFocusElement: null,
+    positionedFocusTop: null,
+    positionedFocusBottom: null,
     focusElementYBottom: 0,
     focusElementYTop: 0,
     inputTypes: {"keyboard": "fxkeyboard"},
@@ -544,6 +569,7 @@ var fxKeyboard = {
     
     _buildSpecialKey: function (obj) {
         var key = document.createElement("div");
+        key.className = "fxkey-special";
         key.style.width = this.settings.key_height*this.settings.scale + "px";
         key.style.height = this.settings.key_height*this.settings.scale + "px";
         key.style.margin = this.settings.padding*(this.settings.scale/2) + "px";
@@ -552,6 +578,7 @@ var fxKeyboard = {
         key.style.display = "flex";
         key.style.alignItems = "center";
         key.style.justifyContent = "center";
+        key.style.whiteSpace = "nowrap";
         key.style.cursor = "pointer";
         key.style.flexGrow = obj.flex;
         key.id = "fxkey-"+obj.label.toLowerCase();
