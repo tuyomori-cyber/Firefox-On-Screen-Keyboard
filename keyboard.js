@@ -93,8 +93,8 @@ var FxKeyboardLocale = '{'+
             '["i", "I"],'+
             '["o", "O"],'+
             '["p", "P"],'+
-            '["&#91;", "&#123;"],'+
-            '["&#93;", "&#125;"],'+
+            '["[", "{"],'+
+            '["]", "}"],'+
             '["\\\\","|","1"]'+
         "], ["+
             '[{"label": "@", "string":"@", "flex": 10, "special": 50}],'+
@@ -472,7 +472,7 @@ var fxKeyboard = {
         key.style.borderRadius = 5*this.settings.scale+"px";
         key.style.cursor = "pointer";
         key.style.backgroundColor = "rgb(255,255,255)";
-        key.innerHTML = char;
+        key.textContent = char;
         key.onmouseenter = function(){key.style.backgroundColor = "rgb(200,200,200)";};
         key.onmouseout = function(){key.style.backgroundColor = "rgb(255,255,255)";};
         key.onmousedown = function () {
@@ -480,9 +480,6 @@ var fxKeyboard = {
         };
         key.onmouseup = function () {
             key.style.backgroundColor = "rgb(200,200,200)";
-            if (char.indexOf("&#") !== -1) {
-                char = key.innerHTML;
-            }
             fxKeyboard._sendKey(char);
             if (fxKeyboard.state === 1) {
                 fxKeyboard.state = 0;
@@ -512,7 +509,7 @@ var fxKeyboard = {
         key.style.cursor = "pointer";
 		key.style.flexGrow = flex;
         key.style.backgroundColor = "rgb(255,255,255)";
-        key.innerHTML = char;
+        key.textContent = char;
 		console.log("FlexGrow of standard key is: "+key.style.flexGrow);
         key.onmouseenter = function(){key.style.backgroundColor = "rgb(200,200,200)";};
         key.onmouseout = function(){key.style.backgroundColor = "rgb(255,255,255)";};
@@ -521,9 +518,6 @@ var fxKeyboard = {
         };
         key.onmouseup = function () {
             key.style.backgroundColor = "rgb(200,200,200)";
-            if (char.indexOf("&#") !== -1) {
-                char = key.innerHTML;
-            }
             fxKeyboard._sendKey(char);
             if (fxKeyboard.state === 1) {
                 fxKeyboard.state = 0;
@@ -547,7 +541,7 @@ var fxKeyboard = {
         key.style.borderRadius = 5*this.settings.scale + "px";
         key.style.backgroundColor = "rgb(255,255,255)";
         key = this._setSpecialFunctions(key,obj);
-        key.innerHTML = obj.label;
+        key.textContent = obj.label;
         return key;
     },
 
