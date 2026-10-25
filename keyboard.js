@@ -175,8 +175,8 @@ var fxKeyboard = {
         preScale: 0,
         padding: 8,
         kb_max_width: window.innerWidth,
-        kb_max_height: 5 * (Math.max(52, Math.min(window.innerWidth * 0.06, window.innerHeight * 0.11)) + 8) + 16,
-		key_height: Math.max(52, Math.min(window.innerWidth * 0.06, window.innerHeight * 0.11))
+        kb_max_height: 5 * (Math.max(28, Math.min(52, window.innerWidth * 0.06, window.innerHeight * 0.11)) + 8) + 16,
+		key_height: Math.max(28, Math.min(52, window.innerWidth * 0.06, window.innerHeight * 0.11))
     },
     
     hierarchy: {
@@ -185,7 +185,17 @@ var fxKeyboard = {
         slavedIFrame: null
     },
 
+    _updateViewportSize: function () {
+        var width = Math.max(1, window.innerWidth);
+        var height = Math.max(1, window.innerHeight);
+        var keyHeight = Math.max(28, Math.min(52, width * 0.06, height * 0.11));
+        this.settings.kb_max_width = width;
+        this.settings.key_height = keyHeight;
+        this.settings.kb_max_height = 5 * (keyHeight + this.settings.padding) + 16;
+    },
+
     _toggleOpen: function (open) {
+        this._updateViewportSize();
         if (document.getElementById(this.activeOSK) === null) {
             this.insertKeyboard(this.activeOSK);
         }
@@ -788,6 +798,13 @@ function oskAction(clicked) {
         }
     }
 }
+
+window.addEventListener("resize", function () {
+    fxKeyboard._updateViewportSize();
+    if (fxKeyboard.activeOSK && fxKeyboard._isOSKOpen()) {
+        fxKeyboard._toggleOpen(true);
+    }
+});
 
 document.addEventListener("dragstart", function load(clicked) {
     if (clicked.target.id.indexOf("fxkey") !== -1) {

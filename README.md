@@ -10,6 +10,14 @@ You can find the add-on at https://addons.mozilla.org/en-US/firefox/addon/fx-osk
 
 データを外部へ収集・送信しないことを `data_collection_permissions.required: ["none"]` で宣言しています。キーの表示にはHTML解釈を伴わない `textContent` を使い、角括弧・波括弧も文字そのものとして定義しています。
 
+## fox-voice-editor連携
+
+fox-voice-editorが設定したこの拡張IDへ`fxosk.frame.request`を送ると、埋め込み用の`keyboard-frame.html` URLを返します。手入力欄へ表示されたフレームのキー操作は、親画面へ`fxosk.key`として返します。通常ページへのコンテンツスクリプト注入とは別経路で、拡張ページの手入力欄も操作できます。
+
+キー高さは埋め込みフレームの横幅・高さに応じて28〜52pxへ自動調整され、ウインドウの分割やリサイズ後も再計算されます。設定画面の倍率はこの自動調整後の大きさに掛かる上限です。
+
+キーボードを閉じた後も、fox-voice-editorの手入力欄へ再フォーカスすると、既存フレームへ再表示通知を送りキーボードを開き直します。
+
 ## アップロード用ZIPの作成
 
 リポジトリ直下で実行します。出力先には未作成のZIPパスを指定してください。

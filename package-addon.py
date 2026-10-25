@@ -8,7 +8,7 @@ from zipfile import ZIP_DEFLATED, ZipFile
 
 ROOT = Path(__file__).resolve().parent
 FILES = (
-    "manifest.json", "kb.js", "keyboard.js", "icon.svg", "icon.png",
+    "manifest.json", "kb.js", "keyboard.js", "keyboard-frame.html", "keyboard-frame.js", "icon.svg", "icon.png",
     "options/options.js", "options/osk_settings.html", "LICENSE",
 )
 

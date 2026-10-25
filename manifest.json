@@ -18,6 +18,9 @@
     "background": {
         "scripts": ["kb.js"]
     },
+    "web_accessible_resources": [
+        "keyboard-frame.html"
+    ],
     "content_scripts": [
         {
             "all_frames": true,
