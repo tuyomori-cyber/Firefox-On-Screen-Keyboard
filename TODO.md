@@ -1,23 +1,26 @@
 # Firefox-On-Screen-Keyboard 現状 ToDo
 
-更新日：2026-10-19
+更新日：2026-10-26
 
 ## 現状
 
-- Foxbook用の改造ブランチは`foxbook-touch`。自分のFork`tuyomori-cyber/Firefox-On-Screen-Keyboard`の`mine/foxbook-touch`を追跡する設定済み。
-- 通常のWebページで文字入力できることは確認済み。The SessionとGoogle検索での削除・検索実行、入力不能だった原因は未確認。
-- Surfaceで倍率設定を100にしてもタッチ向けの大きさには不足。サイズ調整は未実施。
-- AMO検証で指摘されたmanifestの必須宣言・固定ID・`innerHTML`警告は修正済み。必要ファイルだけを含む`/tmp/fx-osk-amo-fixed.zip`を作成・検査済み。
-- fox-voice-editor向けに、拡張間メッセージで埋め込み用キーボードURLを返し、フレームのキー入力を手入力欄へ戻す連携経路を実装。キー高さは埋め込みフレームの横幅・高さに応じて28〜52pxへ自動調整し、リサイズ時も再計算する。閉じた後の再フォーカスでは既存フレームへ再表示通知を送り、閉じたiframeは親画面でも非表示・タップ非受付にする。パッケージ内容を検査済み。Firefox実画面での縮小表示・文字入力・削除・Enter操作確認は未実施。
+- `foxbook-touch`ブランチでFoxbook向け改造を管理し、自分のForkの`mine/foxbook-touch`を追跡する。
+- 固定ID、AMOのデータ収集なし宣言、`textContent`によるキー表示、最小ZIP作成を実装済み。
+- fox-voice-editor向けに、埋め込みURL返却、キー入力通知、表示状態通知、再表示通知を実装済み。
+- 埋め込みキーボードのキー高さを28〜52pxで自動調整し、リサイズ時に再計算する。
+- `package-addon.py`で必要な10ファイルだけを梱包できることを確認済み。
 
 ## 未完了
 
-- [ ] `/tmp/fx-osk-amo-fixed.zip`をAMOで再検証し、修正したエラーの解消を確認する。
-- [ ] SurfaceのCageでThe SessionとGoogle検索の入力・削除・送信、英語配列、画面回転時の表示を評価する。
-- [ ] `foxbook-touch`で高DPI時の`devicePixelRatio`を含むサイズ計算とキー寸法を調整し、Surfaceで一時読み込みしてタッチ操作を確認する。
-- [ ] 調整が終わったら変更をcommitし、自分のForkへpushする。元の作者のリポジトリへ直接pushしない。
-- [ ] 必要が生じた場合、AMO公開版とGitHubソースの差分、Firefoxの設定画面・PDFビューア・ファイル選択画面など通常ページ以外への入力要否を確認する。
+- [ ] Firefox実画面で、fox-voice-editorへの埋め込み表示、文字入力、削除、Enter、閉鎖後の再表示を確認する。
+- [ ] SurfaceのCageで通常ページの入力・削除・送信、英語配列、画面回転、高DPI時のキー寸法を確認する。
+- [ ] `runtime.onMessageExternal`の送信元拡張IDを検証し、想定外の拡張から埋め込みURLを取得できないようにする。
+- [ ] AMOで再検証し、固定ID・データ収集宣言・パッケージ内容に関する指摘の解消を確認する。
+- [ ] 実機確認後、変更を自分のForkへcommit・pushする。元の作者のリポジトリへ直接pushしない。
 
 ## 参照
 
-- Foxbook側の連携事項：`../foxbook-control/TODO.md`
+- 現行仕様：[仕様書 v0.2](specification/fx-osk仕様書v0.2.md)
+- 横断契約：[`IF-VE-OSK-001`](../foxbook/docs/interfaces/fox-voice-editor--firefox-on-screen-keyboard.md)
+- 横断管理：[FX-OSK管理文書](../foxbook/docs/repositories/firefox-on-screen-keyboard.md)
+- 旧文書：[old/](old/)

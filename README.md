@@ -1,34 +1,33 @@
-# Firefox On Screen Keyboard (FX-OSK)
-An on screen keyboard for Firefox for those in a kiosk environment.
+# Firefox On Screen Keyboard (FX-OSK) v1.11.0
 
-You can find the add-on at https://addons.mozilla.org/en-US/firefox/addon/fx-osk/ if you wish to download to your Firefox for testing purposes or if you wish to use it, any suggestions for upgrades will be accepted gratefully, I can incorporate and update to Firefox.
+Firefox用のオンスクリーンキーボードです。通常Webページの入力欄へ表示する経路に加え、Foxbookでは`fox-voice-editor`の拡張ページに埋め込む経路を提供します。
 
-## 自分用ForkのAMO検証対応
+現行の実装仕様は[仕様書 v0.2](specification/fx-osk仕様書v0.2.md)、未完了事項は[TODO](TODO.md)、横断契約は[`IF-VE-OSK-001`](../foxbook/docs/interfaces/fox-voice-editor--firefox-on-screen-keyboard.md)を参照してください。旧文書は[old/](old/)に保管しています。
 
-このForkでは、元の公開版と区別する固定IDとして
-`fx-osk-touch@tuyomori-cyber.github.io` を使用します。元の公開版とは別の拡張として扱われ、設定は自動移行されません。今後この改造版を更新するときは同じIDを維持してください。
+## 拡張の識別と配布
 
-データを外部へ収集・送信しないことを `data_collection_permissions.required: ["none"]` で宣言しています。キーの表示にはHTML解釈を伴わない `textContent` を使い、角括弧・波括弧も文字そのものとして定義しています。
+- Manifest V2拡張、固定IDは`fx-osk-touch@tuyomori-cyber.github.io`。
+- 元の公開版とは別の拡張として扱い、設定は自動移行しない。
+- データ収集なしを`data_collection_permissions.required: ["none"]`で宣言する。
+- 現行バージョンは`1.11.0`。同じIDで提出済み版を更新する場合は、`manifest.json`の版を上げる。
 
 ## fox-voice-editor連携
 
-fox-voice-editorが設定したこの拡張IDへ`fxosk.frame.request`を送ると、埋め込み用の`keyboard-frame.html` URLを返します。手入力欄へ表示されたフレームのキー操作は、親画面へ`fxosk.key`として返します。通常ページへのコンテンツスクリプト注入とは別経路で、拡張ページの手入力欄も操作できます。
+fox-voice-editorは外部メッセージ`fxosk.frame.request`（version 1）で、埋め込み用`keyboard-frame.html`のURLを取得します。フレームはキー入力を`fxosk.key`、表示状態を`fxosk.visibility`として親へ通知します。親からの`fxosk.show`（version 1）で再表示します。
 
-キー高さは埋め込みフレームの横幅・高さに応じて28〜52pxへ自動調整され、ウインドウの分割やリサイズ後も再計算されます。設定画面の倍率はこの自動調整後の大きさに掛かる上限です。
+埋め込み時のキー高さはフレームの幅・高さから28〜52pxへ自動調整され、リサイズ時にも再計算します。閉鎖後のiframeを親側で非表示・非受付にし、再フォーカス時は既存フレームを再表示する責務はfox-voice-editor側にあります。
 
-キーボードを閉じた後も、fox-voice-editorの手入力欄へ再フォーカスすると、既存フレームへ再表示通知を送りキーボードを開き直します。
+現在の受信実装はメッセージ型とversionを検証しますが、送信元拡張IDを検証していません。この境界の強化はTODOに記録しています。
 
-閉じた時点で親画面のiframe自体も非表示にしてタップを受け取らないため、透明なキーボード領域が下側の操作ボタンを覆いません。
-
-## アップロード用ZIPの作成
-
-リポジトリ直下で実行します。出力先には未作成のZIPパスを指定してください。
+## アップロード用ZIP
 
 ```bash
 python3 package-addon.py /tmp/fx-osk-upload.zip
 unzip -l /tmp/fx-osk-upload.zip
 ```
 
-必要な8ファイルだけを梱包します。`.git`、開発設定、既存ZIPは含めません。`.gitignore` はZIP作成時の除外指定ではありません。
+出力先には未作成のZIPパスを指定します。パッケージにはmanifest、背景スクリプト、キーボード本体、埋め込みフレーム、アイコン、設定画面、LICENSEの10ファイルだけを含めます。`.git`、開発設定、既存ZIPは含めません。
 
-アップロード前にZIP内の `manifest.json` とソースを確認してください。ZIPのファイル名によらず、拡張のバージョンは `manifest.json` の値（現在は `1.11.0`）です。同じIDの拡張を更新するときは、提出済みの版よりバージョンを上げる必要があります。
+## 検証
+
+現時点で自動テストはありません。`package-addon.py`によるパッケージ内容の検査は実施済みです。Firefox実画面での埋め込み表示、文字入力、削除、Enter、Surfaceの高DPI・画面回転は未確認です。
